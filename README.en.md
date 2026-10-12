@@ -1,4 +1,4 @@
-# Insurance QA Assistant (Bao Xiaobao)
+# Insurance QA Assistant (An Xin Bao)
 
 [中文](README.md) | English
 
@@ -21,7 +21,7 @@ Use UTF-8 for TXT and CSV files. PDFs must contain extractable text. Run OCR on 
 insurance-qa-assistant/
 ├── data/                    # Insurance documents
 ├── frontend/                # Web page, scripts, and frontend dependencies
-│   └── 保小宝.html
+│   └── 安心宝.html
 ├── config.py                # Paths, models, and retrieval settings
 ├── document_loaders.py      # TXT, PDF, and CSV loaders
 ├── build_vectorstore.py     # Vector database building and search
