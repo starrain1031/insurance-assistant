@@ -1,0 +1,18 @@
+# Install: python -m pip install -r requirements.txt
+# Versions are maintained only in requirements.lock.txt (Windows / Python 3.12).
+-c requirements.lock.txt
+
+# Direct dependencies
+langchain
+langgraph
+langgraph-checkpoint
+langchain-core
+langchain-text-splitters
+langchain-openai
+langchain-chroma
+chromadb
+pypdf
+fastapi
+starlette
+uvicorn
+pydantic

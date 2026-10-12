@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#24664f">
+    <!-- 分开部署时填写后端 URL；留空表示与页面同源。 -->
+    <meta name="api-base-url" content="">
+    <title>安心宝 · 把保险问清楚</title>
+    <style>
+:root {
+    color-scheme: light;
+    --ink: #263b34;
+    --muted: #75847c;
+    --green: #24664f;
+    --green-dark: #184c39;
+    --line: #e6ebe5;
+    --paper: #ffffff;
+    --soft: #f5f8f4;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    color: var(--ink);
+    background: #edf1eb;
+    font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+button, textarea { font: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:disabled { cursor: not-allowed; }
+button:focus-visible { outline: 3px solid #66a38b; outline-offset: 4px; }
+svg { flex-shrink: 0; vertical-align: middle; }
+[hidden] { display: none !important; }
+.container {
+    display: grid;
+    grid-template-columns: 266px minmax(0, 1fr);
+    width: min(1280px, calc(100% - 64px));
+    height: calc(100vh - 64px);
+    height: calc(100dvh - 64px);
+    min-height: 540px;
+    max-height: 960px;
+    margin: 32px auto;
+    overflow: hidden;
+    border: 1px solid #dce4da;
+    border-radius: 24px;
+    background: var(--paper);
+    box-shadow: 0 20px 70px -35px #183d3029;
+}
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
+    padding: 30px 22px 24px;
+    min-height: 0;
+    overflow-y: auto;
+    background: var(--soft);
+    border-right: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 11px; }
+.brand-mark {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    color: #fff;
+    background: var(--green);
+    box-shadow: 0 5px 10px #24664f14;
+}
+.brand-name { display: block; margin-bottom: 3px; font-size: 21px; font-weight: 700; letter-spacing: 1px; }
+.brand-caption { color: var(--muted); font-size: 11px; letter-spacing: 1px; }
+.sidebar-intro { padding: 0 3px; }
+.sidebar-intro h2 { margin: 0 0 10px; font-size: 23px; line-height: 1.65; font-weight: 600; letter-spacing: .4px; }
+.sidebar-intro p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.9; }
+.suggestions-label { margin: 0 0 13px 4px; font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: 2px; }
+.suggestions { display: flex; flex-direction: column; gap: 10px; }
+.suggestion-chip {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    padding: 13px 10px;
+    text-align: left;
+    color: #3b5146;
+    background: #fff;
+    border: 1px solid #e3eae0;
+    border-radius: 13px;
+    transition: background .18s, border-color .18s, transform .18s;
+}
+.suggestion-chip:hover:not(:disabled) { background: #edf5ee; border-color: #b9d2bf; transform: translateY(-1px); }
+.suggestion-chip:disabled { opacity: .5; }
+.suggestion-icon { display: grid; place-items: center; color: #48785d; background: #f1f6ed; width: 34px; height: 36px; border-radius: 10px; }
+.suggestion-copy { flex: 1; min-width: 0; }
+.suggestion-title { display: block; font-size: 13px; font-weight: 600; }
+.suggestion-description { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; }
+.suggestion-arrow { color: #a1b0a2; }
+.sidebar-note { margin-top: auto; padding: 22px 4px 0; border-top: 1px solid #e2e8df; }
+.sidebar-note span { display: block; font-size: 12px; font-weight: 600; color: #536e5c; }
+.sidebar-note p { margin: 8px 0 0; color: #869187; font-size: 11px; line-height: 1.8; }
+.workspace { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 25px 34px; border-bottom: 1px solid #eef1eb; flex-shrink: 0; }
+.header-title h1 { margin: 0; font-size: 17px; font-weight: 600; }
+.header-title p { margin: 6px 0 0; font-size: 11px; color: var(--muted); }
+.mobile-brand { display: none; }
+.header-actions { display: flex; align-items: center; gap: 14px; }
+.status { display: inline-flex; align-items: center; gap: 7px; padding: 7px 0; border: 0; background: none; color: var(--muted); white-space: nowrap; font-size: 11px; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: #cc9a36; }
+.status[data-state="reachable"] .status-dot { background: #439769; box-shadow: 0 0 0 3px #edf6ef; }
+.status[data-state="offline"] .status-dot, .status[data-state="unreachable"] .status-dot { background: #be6055; }
+.new-chat-button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #dae4d8; border-radius: 10px; padding: 9px 12px; background: #fff; color: #486250; white-space: nowrap; font-size: 12px; transition: background .18s; }
+.new-chat-button:hover:not(:disabled) { background: var(--soft); }
+.new-chat-button:disabled { opacity: .45; }
+.chat-container { flex: 1; display: flex; flex-direction: column; gap: 24px; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 30px 36px; scrollbar-width: thin; scrollbar-color: #d8e1d5 transparent; }
+.welcome-message { width: 100%; max-width: 500px; margin: auto; padding: 24px 0 30px; text-align: center; flex-shrink: 0; }
+.welcome-emblem { display: grid; place-items: center; width: 66px; height: 66px; margin: 0 auto 23px; background: #ecf4e9; color: var(--green); border: 1px solid #e0ebdb; border-radius: 22px; }
+.welcome-eyebrow { margin: 0 0 14px; font-size: 11px; font-weight: 500; color: #82927d; letter-spacing: 3px; }
+.welcome-message h2 { margin: 0; font-size: clamp(27px, 3vw, 37px); line-height: 1.5; letter-spacing: -.7px; font-weight: 600; }
+.welcome-message h2 span { color: var(--green); }
+.welcome-description { max-width: 380px; margin: 18px auto 0; color: var(--muted); font-size: 13px; line-height: 1.95; }
+.capabilities { display: flex; justify-content: center; flex-wrap: wrap; gap: 17px; margin-top: 25px; }
+.capability { display: inline-flex; align-items: center; gap: 5px; color: #71836e; font-size: 11px; }
+.capability svg { color: #5e8a67; }
+.message { flex-shrink: 0; max-width: 86%; padding: 18px 21px; font-size: 14px; line-height: 1.9; border-radius: 17px; animation: appear .2s ease-out; }
+.user-message { align-self: flex-end; color: #fff; background: var(--green); border-bottom-right-radius: 5px; }
+.bot-message { align-self: flex-start; background: #f6f8f4; border: 1px solid #e9eee5; border-bottom-left-radius: 5px; }
+.message-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 11px; font-weight: 600; }
+.user-message .message-header { justify-content: flex-end; color: #d4e6d8; }
+.bot-message .message-header { color: #617958; }
+.user-avatar, .bot-avatar { display: grid; place-items: center; width: 23px; height: 23px; border-radius: 8px; }
+.user-avatar { background: #ffffff17; color: #fff; }
+.bot-avatar { background: #e5eedf; color: var(--green); }
+.message-content { white-space: pre-wrap; overflow-wrap: anywhere; }
+.message-notice { margin-top: 12px; padding-top: 10px; border-top: 1px solid #dde5d8; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+.notice-error { color: #a74c40; }
+.notice-info { color: #758265; }
+.typing-indicator { display: flex; align-items: center; gap: 9px; color: #83927c; font-size: 12px; }
+.typing-indicator::before { content: ''; width: 6px; height: 6px; background: #7e9d71; border-radius: 50%; animation: pulse 1.2s infinite; }
+.composer { flex-shrink: 0; padding: 12px 34px 20px; background: #fff; }
+.input-container { display: flex; align-items: flex-end; gap: 10px; padding: 12px; border: 1px solid #dbe5d7; border-radius: 17px; background: #fff; box-shadow: 0 5px 22px -10px #42623829; transition: border-color .2s, box-shadow .2s; }
+.input-container:focus-within { border-color: #8db29b; box-shadow: 0 0 0 3px #edf4ed; }
+.input-box { flex: 1; width: 0; min-width: 0; min-height: 44px; max-height: 160px; padding: 10px 7px; border: 0; outline: 0; background: none; resize: none; color: var(--ink); font-size: 14px; line-height: 1.7; }
+.input-box::placeholder { color: #99a297; }
+.input-box:disabled { opacity: .65; }
+.send-button { flex-shrink: 0; display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 1px; padding: 0; border: 0; border-radius: 12px; color: #fff; background: var(--green); transition: background .18s, transform .18s; }
+.send-button:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
+.send-button:disabled { background: #d7e1d2; color: #90a087; }
+.cancel-button { flex-shrink: 0; height: 42px; margin-bottom: 1px; padding: 0 12px; color: #98614a; background: #fbf4ee; border: 1px solid #efddcf; border-radius: 11px; font-size: 12px; }
+.cancel-button:disabled { opacity: .6; cursor: wait; }
+.composer-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 4px 0; }
+.input-hint { margin: 0; color: #899484; font-size: 10px; line-height: 1.5; }
+.composer-signature { display: inline-flex; align-items: center; gap: 4px; color: #92a08c; font-size: 10px; white-space: nowrap; }
+@keyframes appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 50% { opacity: .25; } }
+@media (max-width: 1020px) {
+    .container { grid-template-columns: 230px minmax(0, 1fr); width: calc(100% - 32px); height: calc(100dvh - 32px); margin: 16px auto; }
+    .sidebar { padding: 26px 16px 20px; }
+    .header { padding: 23px 24px; }
+    .header-actions { gap: 10px; }
+    .chat-container { padding: 26px 24px; }
+    .composer { padding: 10px 24px 18px; }
+    .suggestion-description { font-size: 10px; }
+}
+@media (max-width: 760px) {
+    body { background: #fff; }
+    .container { display: flex; flex-direction: column; width: 100%; height: 100vh; height: 100dvh; min-height: 0; max-height: none; margin: 0; border: 0; border-radius: 0; box-shadow: none; }
+    .workspace { display: contents; }
+    .header { order: 1; padding: 18px 20px; gap: 10px; }
+    .header-title h1 { font-size: 18px; }
+    .desktop-title { display: none; }
+    .mobile-brand { display: inline; }
+    .header-title p { font-size: 10px; }
+    .header-actions { gap: 10px; }
+    .status { font-size: 10px; }
+    .new-chat-button { padding: 8px 9px; font-size: 11px; }
+    .sidebar { order: 2; display: block; flex-shrink: 0; padding: 12px 0; overflow: visible; border: 0; border-bottom: 1px solid #f0f3ed; background: #fafbf8; }
+    .brand, .sidebar-intro, .suggestions-label, .sidebar-note { display: none; }
+    .suggestions { flex-direction: row; gap: 8px; overflow-x: auto; padding: 0 20px 2px; scrollbar-width: none; }
+    .suggestions::-webkit-scrollbar { display: none; }
+    .suggestion-chip { flex: 0 0 auto; width: auto; padding: 8px 12px; gap: 7px; border-radius: 11px; }
+    .suggestion-title { font-size: 11px; font-weight: 500; }
+    .suggestion-description, .suggestion-arrow { display: none; }
+    .suggestion-icon { width: auto; height: auto; background: none; }
+    .suggestion-icon svg { width: 15px; height: 15px; }
+    .chat-container { order: 3; gap: 18px; padding: 22px 18px; }
+    .welcome-message { padding: 22px 8px; }
+    .welcome-emblem { width: 58px; height: 58px; border-radius: 19px; margin-bottom: 22px; }
+    .welcome-message h2 { font-size: 29px; }
+    .welcome-eyebrow { font-size: 10px; letter-spacing: 2px; }
+    .welcome-description { max-width: 280px; font-size: 12px; }
+    .capabilities { gap: 15px; margin-top: 21px; }
+    .capability { font-size: 10px; }
+    .message { max-width: 92%; font-size: 14px; padding: 15px 17px; }
+    .composer { order: 4; padding: 10px 14px max(14px, env(safe-area-inset-bottom)); }
+    .input-container { padding: 8px; gap: 7px; border-radius: 15px; }
+    .input-box { font-size: 16px; padding: 8px 4px; line-height: 1.6; }
+    .composer-footer { padding-top: 10px; }
+    .composer-signature { display: none; }
+    .input-hint { font-size: 10px; }
+}
+@media (max-width: 360px) {
+    .header { padding: 15px 14px; }
+    .header-title p { display: none; }
+    .header-actions { gap: 8px; }
+    .new-chat-button svg { display: none; }
+    .welcome-message h2 { font-size: 26px; }
+    .cancel-button { padding: 0 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+.bot-message { min-width: 0; }
+.markdown-body { white-space: normal; min-width: 0; }
+.markdown-body > :first-child { margin-top: 0; }
+.markdown-body > :last-child { margin-bottom: 0; }
+.markdown-body p { margin: 0 0 12px; }
+.markdown-body h1, .markdown-body h2, .markdown-body h3,
+.markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    margin: 20px 0 10px;
+    line-height: 1.5;
+    font-weight: 650;
+    color: var(--green-dark);
+}
+.markdown-body h1 { font-size: 22px; }
+.markdown-body h2 { font-size: 19px; }
+.markdown-body h3 { font-size: 17px; }
+.markdown-body h4, .markdown-body h5, .markdown-body h6 { font-size: 15px; }
+.markdown-body strong { font-weight: 650; }
+.markdown-body ul, .markdown-body ol { margin: 10px 0 14px; padding-left: 25px; }
+.markdown-body li { padding-left: 2px; margin: 5px 0; }
+.markdown-body li > p { margin: 5px 0; }
+.markdown-body li > ul, .markdown-body li > ol { margin: 5px 0; }
+.markdown-body li input { margin-right: 6px; accent-color: var(--green); }
+.markdown-body blockquote {
+    margin: 14px 0;
+    padding: 10px 14px;
+    border-left: 3px solid #9abb9c;
+    border-radius: 0 8px 8px 0;
+    background: #edf3e9;
+    color: #5a7053;
+}
+.markdown-body blockquote > :last-child { margin-bottom: 0; }
+.markdown-body a { color: #206a53; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.markdown-body a:hover { color: #123f30; }
+.markdown-body code {
+    padding: 2px 5px;
+    border-radius: 5px;
+    background: #e7eee1;
+    color: #3f6046;
+    font: .9em/1.7 Consolas, "Cascadia Code", monospace;
+    white-space: break-spaces;
+}
+.markdown-body pre {
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 14px 0;
+    padding: 14px 16px;
+    border: 1px solid #dce6d6;
+    border-radius: 10px;
+    background: #edf2e9;
+    white-space: pre;
+    tab-size: 4;
+}
+.markdown-body pre code { padding: 0; background: none; white-space: pre; overflow-wrap: normal; }
+.markdown-body hr { margin: 20px 0; border: 0; border-top: 1px solid #dce5d6; }
+.markdown-table { max-width: 100%; overflow-x: auto; margin: 14px 0; border: 1px solid #dce5d6; border-radius: 9px; }
+.markdown-table:focus-visible { outline: 2px solid #66a38b; outline-offset: 2px; }
+.markdown-body table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.markdown-body th, .markdown-body td { min-width: 95px; padding: 9px 12px; border-right: 1px solid #e2e9dc; border-bottom: 1px solid #e2e9dc; text-align: left; vertical-align: top; }
+.markdown-body th { background: #eaf1e4; font-weight: 600; color: #45633f; white-space: nowrap; }
+.markdown-body td { background: #fcfdfb; }
+.markdown-body tr:last-child td { border-bottom: 0; }
+.markdown-body th:last-child, .markdown-body td:last-child { border-right: 0; }
+.markdown-body [align="center"] { text-align: center; }
+.markdown-body [align="right"] { text-align: right; }
+@media (max-width: 760px) {
+    .markdown-body h1 { font-size: 20px; }
+    .markdown-body h2 { font-size: 18px; }
+    .markdown-body pre { padding: 11px 12px; }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar" aria-label="常见保险问题">
+            <div class="brand">
+                <span class="brand-mark"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 8 9 8 9s8-4.5 8-9V6Z"/><path d="m8.5 12 2.3 2.3 4.7-4.6"/></svg></span>
+                <div><span class="brand-name">安心宝</span><span class="brand-caption">你的智能保险顾问</span></div>
+            </div>
+            <div class="sidebar-intro">
+                <h2>复杂的保险，<br>慢慢说清楚。</h2>
+                <p>从了解开始，为每一份保障<br>多一份从容。</p>
+            </div>
+            <nav aria-label="选择一个问题开始咨询">
+                <h2 class="suggestions-label">你可能想了解</h2>
+                <div class="suggestions">
+                    <button type="button" class="suggestion-chip" data-question="终身寿险和定期寿险有什么区别？" title="终身寿险和定期寿险有什么区别？">
+                        <span class="suggestion-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 8 9 8 9s8-4.5 8-9V6Z"/><path d="m8.5 12 2.3 2.3 4.7-4.6"/></svg></span>
+                        <span class="suggestion-copy"><span class="suggestion-title">寿险怎么选</span><span class="suggestion-description">读懂保障期限的区别</span></span>
+                        <span class="suggestion-arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+                    </button>
+                    <button type="button" class="suggestion-chip" data-question="重疾险一般包含哪些疾病？" title="重疾险一般包含哪些疾病？">
+                        <span class="suggestion-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></span>
+                        <span class="suggestion-copy"><span class="suggestion-title">重疾险保什么</span><span class="suggestion-description">了解疾病保障范围</span></span>
+                        <span class="suggestion-arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+                    </button>
+                    <button type="button" class="suggestion-chip" data-question="如何选择适合自己的医疗保险？" title="如何选择适合自己的医疗保险？">
+                        <span class="suggestion-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M9 5V3h6v2M12 10v6M9 13h6"/></svg></span>
+                        <span class="suggestion-copy"><span class="suggestion-title">医疗险怎么配</span><span class="suggestion-description">找到适合自己的保障</span></span>
+                        <span class="suggestion-arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+                    </button>
+                    <button type="button" class="suggestion-chip" data-question="保险理赔流程是怎样的？" title="保险理赔流程是怎样的？">
+                        <span class="suggestion-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 12h8M8 16h6"/></svg></span>
+                        <span class="suggestion-copy"><span class="suggestion-title">理赔如何办理</span><span class="suggestion-description">提前了解流程与材料</span></span>
+                        <span class="suggestion-arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+                    </button>
+                </div>
+            </nav>
+            <div class="sidebar-note">
+                <span>每一个问题，都值得认真回答。</span>
+                <p>选保险 · 读条款 · 懂理赔<br>安心宝，陪你一步步了解。</p>
+            </div>
+        </aside>
+        <main class="workspace">
+            <header class="header">
+                <div class="header-title">
+                    <h1><span class="desktop-title">保险咨询</span><span class="mobile-brand">安心宝</span></h1>
+                    <p>关于保障，聊得明白一点</p>
+                </div>
+                <div class="header-actions">
+                    <button type="button" class="status" id="serviceStatus" data-state="checking" title="点击检测服务连接">
+                        <span class="status-dot" aria-hidden="true"></span>
+                        <span id="serviceStatusText" role="status" aria-live="polite">检测中…</span>
+                    </button>
+                    <button type="button" class="new-chat-button" id="newChatButton"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>新对话</span></button>
+                </div>
+            </header>
+            <div class="chat-container" id="chatContainer" role="log" aria-label="聊天记录" aria-live="polite" aria-relevant="additions" aria-busy="false">
+                <div class="welcome-message">
+                    <div class="welcome-emblem"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 8 9 8 9s8-4.5 8-9V6Z"/><path d="m8.5 12 2.3 2.3 4.7-4.6"/></svg></div>
+                    <p class="welcome-eyebrow">你的每一份安心，都很重要</p>
+                    <h2>把保险问清楚，<br><span>让选择更安心。</span></h2>
+                    <p class="welcome-description">你好，我是安心宝。陪你了解保障、读懂条款，<br>也帮你梳理理赔流程。想从哪里开始？</p>
+                    <div class="capabilities">
+                        <span class="capability"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>保障分析</span>
+                        <span class="capability"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>条款解读</span>
+                        <span class="capability"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>理赔指引</span>
+                    </div>
+                </div>
+            </div>
+            <footer class="composer">
+                <div class="input-container">
+                    <textarea class="input-box" id="userInput" rows="1" placeholder="写下你的保险疑问…" aria-label="保险问题" aria-describedby="inputHint" autocomplete="off"></textarea>
+                    <button type="button" class="cancel-button" id="cancelButton" hidden title="停止等待和接收，服务端可能仍在处理">取消</button>
+                    <button type="button" class="send-button" id="sendButton" aria-label="发送消息" title="发送消息"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button>
+                </div>
+                <div class="composer-footer">
+                    <p class="input-hint" id="inputHint">Enter 发送 · Shift + Enter 换行 · 等待时可取消接收</p>
+                    <span class="composer-signature"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 8 9 8 9s8-4.5 8-9V6Z"/><path d="m8.5 12 2.3 2.3 4.7-4.6"/></svg>安心宝 · 陪你读懂保障</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+    <script src="vendor/marked-17.0.5.js" defer></script>
+    <script src="vendor/dompurify-3.4.16.js" defer></script>
+    <script src="app.js" defer></script>
+</body>
+</html>
