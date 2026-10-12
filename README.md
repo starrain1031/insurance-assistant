@@ -21,7 +21,7 @@ TXT 和 CSV 请使用 UTF-8 编码。PDF 需要能够提取文本；扫描件请
 insurance-qa-assistant/
 ├── data/                    # 保险资料
 ├── frontend/                # 网页、脚本和前端依赖
-│   └── 保小宝.html
+│   └── 安心宝.html
 ├── config.py                # 路径、模型和检索参数
 ├── document_loaders.py      # TXT、PDF、CSV 加载器
 ├── build_vectorstore.py     # 构建和查询向量库
